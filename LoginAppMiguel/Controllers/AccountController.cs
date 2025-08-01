@@ -44,8 +44,8 @@ namespace LoginAppMiguel.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Users");
+                    // Redirect to login page instead of automatically signing in
+                    return RedirectToAction("Login", "Account");
                 }
 
                 foreach (var error in result.Errors)

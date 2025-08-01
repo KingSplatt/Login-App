@@ -70,15 +70,15 @@ namespace LoginAppMiguel.Controllers
                 {
                     case "block":
                         await BlockUsers(request.UserIds);
-                        message = $"Se bloquearon {request.UserIds.Count} user(s) successfully.";
+                        message = $" {request.UserIds.Count} user(s) were blocked successfully.";
                         break;
                     case "unblock":
                         await UnblockUsers(request.UserIds);
-                        message = $"Se desbloquearon {request.UserIds.Count} user(s) successfully.";
+                        message = $" {request.UserIds.Count} user(s) were unblocked successfully.";
                         break;
                     case "delete":
                         await DeleteUsers(request.UserIds);
-                        message = $"Se eliminaron {request.UserIds.Count} user(s) successfully.";
+                        message = $" {request.UserIds.Count} user(s) were deleted successfully.";
                         break;
                     default:
                         return Json(new { success = false, message = "Invalid action or something went wrong." });

@@ -67,14 +67,14 @@
                                             @user.LastLoginTime.Value.ToString("dd/MM/yyyy HH:mm:ss")
                                         }
                                         else{
-                                            <span class="text-muted">Nunca</span>
+                                            <span class="text-muted">Never</span>
                                         }
                                     </td>
                                     <td>
                                         @if (user.IsBlocked){
-                                            <span class="badge bg-danger">Bloqueado</span>
+                                            <span class="badge bg-danger">Blocked</span>
                                         }else{
-                                            <span class="badge bg-success">Activo</span>
+                                            <span class="badge bg-success">Active</span>
                                         }
                                     </td>
                                 </tr>
@@ -82,7 +82,7 @@
                         }
                         else{
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No hay usuarios registrados</td>
+                                <td colspan="5" class="text-center text-muted">No users registered</td>
                             </tr>
                         }
                     </tbody>
@@ -128,14 +128,19 @@
             const userIds = Array.from(checkedBoxes).map(cb => cb.value);
             let actionText = '';
             switch(action) {
-                case 'block': actionText = 'bloquear'; break;
-                case 'unblock': actionText = 'desbloquear'; break;
-                case 'delete': actionText = 'eliminar'; break;
+                case 'block': actionText = 'block'; break;
+                case 'unblock': actionText = 'unblock'; break;
+                case 'delete': actionText = 'delete'; break;
             }
 
-            if (!confirm(`Are you sure you want to ${actionText} ${userIds.length} user(s)?`)) {
-                return;
-            }
+            const newCustomAlert = document.createElement('div');
+            newCustomAlert.className = 'alert alert-info';
+            newCustomAlert.innerHTML = `<strong>Processing...</strong> Please wait while we ${actionText} the selected user(s).`;
+            document.body.appendChild(newCustomAlert);
+            setTimeout(() => {
+                newCustomAlert.remove();
+            }, 5000);
+
 
             const buttons = document.querySelectorAll('#blockBtn, #unblockBtn, #deleteBtn');
             buttons.forEach(btn => {
@@ -154,29 +159,17 @@
                     action: action
                 })
             }).then(response => response.json()).then(data => {
-                if (data.success) {
-                    if (data.redirectToLogin) {
-                        alert(data.message);
-                        window.location.href = '@Url.Action("Login", "Account")';
-                    } else {
-                        // Recargar la página para mostrar los cambios
-                        window.location.reload();
-                    }
-                } else {
-                    alert(data.message);
-                    if (data.redirectToLogin) {
-                        window.location.href = '@Url.Action("Login", "Account")';
-                    }
-                }
+
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Ocurrió un error al procesar la solicitud.');
+                alert('Something went wrong while processing your request. Please try again later.');
             })
             .finally(() => {
-                document.getElementById('blockBtn').innerHTML = '<i class="fas fa-ban"></i> Bloquear';
-                document.getElementById('unblockBtn').innerHTML = '<i class="fas fa-unlock"></i> Desbloquear';
-                document.getElementById('deleteBtn').innerHTML = '<i class="fas fa-trash"></i> Eliminar';
+                document.getElementById('blockBtn').innerHTML = '<i class="fas fa-ban"></i> Block';
+                document.getElementById('unblockBtn').innerHTML = '<i class="fas fa-unlock"></i> ';
+                document.getElementById('deleteBtn').innerHTML = '<i class="fas fa-trash"></i> ';
                 updateToolbarButtons();
             });
         }
