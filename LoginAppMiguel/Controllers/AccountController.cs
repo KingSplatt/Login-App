@@ -30,37 +30,35 @@ namespace LoginAppMiguel.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = new User
-                {
+            if (ModelState.IsValid){
+                var user = new User{
                     UserName = model.Email,
                     Email = model.Email,
                     FullName = model.FullName,
                     RegistrationTime = DateTime.UtcNow
                 };
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
-                {
-                    // Redirect to login page instead of automatically signing in
-                    return RedirectToAction("Login", "Account");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    if (error.Code == "DuplicateUserName" || error.Code == "DuplicateEmail")
-                    {
-                        ModelState.AddModelError("Email", "This email is already registered.");
+                try{
+                    var result = await _userManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded){
+                        return RedirectToAction("Login", "Account");
                     }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                    foreach (var error in result.Errors){
+                        if (error.Code == "DuplicateUserName" || error.Code == "DuplicateEmail"){
+                            ModelState.AddModelError("Email", "This email is already registeredee.");
+                            break;
+                        }
+                    }
+                }
+                catch (DbUpdateException ex){
+                    if (ex.InnerException?.Message.Contains("Duplicate entry") == true ||
+                        ex.InnerException?.Message.Contains("UNIQUE constraint") == true ||
+                        ex.InnerException?.Message.Contains("duplicate key") == true){
+                        ModelState.AddModelError("Email", "This email is already registered.");
+                    }else{
+                        ModelState.AddModelError(string.Empty, "An error occurred while creating the account. Please try again.");
                     }
                 }
             }
-
             return View(model);
         }
 
